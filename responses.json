@@ -1,0 +1,16 @@
+{
+  "greeting": "Hello! Welcome to {bot_name}. I can explain the basics of cryptocurrency and some intermediate topics. What would you like to explore?",
+  "help": "You can ask me about: what crypto is, why it has value, wallets, safety and scams, investing, Web3 and NFTs, everyday use and stablecoins, inflation and savings, or DeFi. I can also explain five major coins: Bitcoin, Ethereum, Tether (USDT), BNB and Solana.",
+  "thanks": "You're welcome! Ask me anything else about crypto, or type 'bye' to leave.",
+  "bye": "Goodbye! Stay safe out there in the crypto world!",
+  "crypto_basics": "Cryptocurrency is digital money that runs on a blockchain: a shared public record of transactions kept by thousands of computers instead of one bank. Bitcoin (2009) was the first; Ethereum added programmable 'smart contracts'.",
+  "crypto_value": "Crypto doesn't rely on a central bank. Its value comes from supply and demand, limited supply (only 21 million Bitcoin will ever exist), its usefulness, and the trust of the people who use the network. That's also why prices can swing a lot.",
+  "crypto_wallets": "A crypto wallet stores your keys, not your coins. Your public address is like an email address people send funds to; your private key (or seed phrase) is the secret that approves transactions. Hot wallets are online apps, cold wallets are offline devices. Never share your private key or seed phrase!",
+  "crypto_safety": "To avoid scams: never share your seed phrase (no real company will ask for it), ignore 'guaranteed profit' offers, double-check website URLs, and turn on 2FA. Blockchain transactions are permanent and can't be reversed.",
+  "investing_trading": "People buy crypto on exchanges (like Coinbase or Binance) or peer-to-peer. Common strategies are holding long term ('HODL') or buying a fixed amount regularly (dollar-cost averaging). Prices are volatile, so only use money you can afford to lose.",
+  "web3_nfts": "Web3 is the idea of an internet where users own their data and digital assets. NFTs (Non-Fungible Tokens) are unique tokens that prove ownership of a specific digital item, and dApps are apps that run on smart contracts instead of a company's server.",
+  "everyday_use": "Crypto can be used for payments and for sending money across borders quickly. Stablecoins like USDC and USDT are pegged to the US dollar, so their price stays around $1. They're only as safe as the company holding the reserves behind them.",
+  "inflation_savings": "In countries with high inflation, some people save in stablecoins (digital dollars) so their money doesn't lose value as fast as the local currency. Bitcoin is sometimes called 'digital gold', but its price is very volatile in the short term.",
+  "defi": "Decentralized Finance (DeFi) replaces banks with smart contracts. Users can lend, borrow, or earn interest directly, and staking means locking coins to help secure a network in exchange for rewards. Higher yields usually mean higher risk.",
+  "unknown": "I'm not sure about that topic. Type 'help' to see the crypto topics I can explain."
+}

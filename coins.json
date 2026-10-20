@@ -1,0 +1,32 @@
+{
+  "bitcoin": {
+    "name": "Bitcoin (BTC)",
+    "aliases": ["bitcoin", "bitcoins", "btc"],
+    "profile": "Bitcoin (BTC) is the first cryptocurrency, launched in 2009 by an anonymous creator called Satoshi Nakamoto. Only 21 million will ever exist, which is why people call it 'digital gold' and use it as a long-term store of value. New coins are created by 'mining', where computers compete to secure the network. Main risk: its price can rise or fall 20% or more in weeks.",
+    "note": "Bitcoin is the original cryptocurrency, with a fixed supply of 21 million coins."
+  },
+  "ethereum": {
+    "name": "Ethereum (ETH)",
+    "aliases": ["ethereum", "eth", "ether"],
+    "profile": "Ethereum (ETH) launched in 2015, created by Vitalik Buterin and others. It's more than money: it runs 'smart contracts', programs that power most of DeFi, NFTs and many stablecoins. Since 2022 it uses 'proof of stake' instead of mining, which uses far less energy. Main risk: fees can get expensive when the network is busy, and the price is volatile.",
+    "note": "Ethereum is the main platform for smart contracts, DeFi and NFTs."
+  },
+  "tether": {
+    "name": "Tether (USDT)",
+    "aliases": ["tether", "usdt"],
+    "profile": "Tether (USDT) is the largest stablecoin, created in 2014. Each USDT is meant to be worth exactly 1 US dollar, backed by reserves the company Tether holds. In Latin America it's widely used to save in 'digital dollars' and for peer-to-peer payments. Main risk: it depends on one company: Tether can freeze funds, and its reserves have been questioned in the past.",
+    "note": "Tether (USDT) is a stablecoin designed to always be worth 1 US dollar."
+  },
+  "bnb": {
+    "name": "BNB",
+    "aliases": ["bnb", "binance coin"],
+    "profile": "BNB was created in 2017 by Binance, the world's largest crypto exchange. It started as a way to get discounts on trading fees and now also powers BNB Chain, a blockchain with low fees. Main risk: its value is closely tied to one company, Binance, and its legal and regulatory problems.",
+    "note": "BNB is the coin of the Binance exchange and its BNB Chain network."
+  },
+  "solana": {
+    "name": "Solana (SOL)",
+    "aliases": ["solana"],
+    "profile": "Solana (SOL) launched in 2020, founded by Anatoly Yakovenko. It's built for speed: thousands of transactions per second with fees of a fraction of a cent, which makes it popular for apps, payments, NFTs and meme coins. Main risk: the network has had several outages in the past, and the price is very volatile.",
+    "note": "Solana is a fast blockchain known for very low transaction fees."
+  }
+}
