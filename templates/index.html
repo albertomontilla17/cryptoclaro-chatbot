@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ bot_name }}</title>
+<style>
+  :root {
+    --bg: #f4f6f5; --panel: #ffffff; --ink: #14201b; --muted: #5c6b64;
+    --line: #dde4e0; --accent: #12a150; --accent-ink: #ffffff; --accent-soft: #e3f5ea;
+    --bot: #eef2f0; --warn: #b7791f; --warn-soft: #fdf3e1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1311; --panel: #151d1a; --ink: #e6efea; --muted: #94a59d;
+      --line: #26322d; --accent: #2bd477; --accent-ink: #06210f; --accent-soft: #143524;
+      --bot: #1d2824; --warn: #f0b44c; --warn-soft: #3a2c12;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--panel);
+  }
+  .logo {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--accent);
+    display: grid; place-items: center; color: var(--accent-ink); font-weight: 800;
+  }
+  header h1 { font-size: 17px; margin: 0; }
+  header p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  main {
+    display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px;
+    max-width: 1150px; margin: 0 auto; padding: 16px; height: calc(100vh - 64px);
+  }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    display: flex; flex-direction: column; min-height: 0;
+  }
+
+  /* Chat */
+  #messages { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .msg { max-width: 80%; padding: 10px 14px; border-radius: 14px; white-space: pre-wrap; }
+  .msg.user { align-self: flex-end; background: var(--accent); color: var(--accent-ink); border-bottom-right-radius: 4px; }
+  .msg.bot { align-self: flex-start; background: var(--bot); border-bottom-left-radius: 4px; }
+  .tag {
+    display: inline-block; margin-top: 6px; font-size: 11px; padding: 1px 8px; border-radius: 99px;
+    background: var(--accent-soft); color: var(--accent); font-family: ui-monospace, Consolas, monospace;
+  }
+  .tag.unknown, .tag.negative { background: var(--warn-soft); color: var(--warn); }
+  .tag.neutral { background: var(--line); color: var(--muted); }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .tags .tag { margin-top: 0; }
+  .mood-scale { position: relative; height: 8px; border-radius: 99px; margin: 8px 0 4px;
+    background: linear-gradient(90deg, var(--warn) 0%, var(--line) 50%, var(--accent) 100%); }
+  .mood-dot { position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--panel); border: 3px solid var(--ink); transform: translate(-50%, -50%); }
+  .mood-ends { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 18px 10px; }
+  .chip {
+    border: 1px solid var(--line); background: transparent; color: var(--ink);
+    border-radius: 99px; padding: 5px 11px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
+  input {
+    flex: 1; min-width: 0; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); font: inherit;
+  }
+  input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  button.send {
+    padding: 0 18px; border: 0; border-radius: 10px; background: var(--accent);
+    color: var(--accent-ink); font: inherit; font-weight: 600; cursor: pointer;
+  }
+
+  /* Under the hood */
+  .hood { padding: 16px 18px; overflow-y: auto; }
+  .hood h2 { font-size: 14px; margin: 0 0 2px; }
+  .hood .sub { font-size: 12px; color: var(--muted); margin: 0 0 14px; }
+  .step { border-top: 1px solid var(--line); padding: 10px 0; }
+  .step-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; }
+  .step-label b { color: var(--accent); }
+  .mono { font-family: ui-monospace, Consolas, monospace; font-size: 13px; word-break: break-word; }
+  .word { display: inline-block; margin: 2px 4px 2px 0; padding: 1px 7px; border-radius: 6px; background: var(--bot); }
+  .word.known { background: var(--accent-soft); color: var(--accent); }
+  .bar-row { margin: 6px 0; }
+  .bar-head { display: flex; justify-content: space-between; font-size: 12px; }
+  .bar { height: 7px; border-radius: 99px; background: var(--bot); overflow: hidden; margin-top: 3px; position: relative; }
+  .bar span { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+  .bar .th { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--warn); }
+  .empty { color: var(--muted); font-size: 13px; }
+  .legend { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  @media (max-width: 820px) {
+    main { grid-template-columns: 1fr; height: auto; padding: 12px 16px; }
+    #chat { height: 70vh; }
+    .msg { max-width: 92%; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">₿</div>
+  <div>
+    <h1>{{ bot_name }}</h1>
+    <p>Crypto 101 chatbot · Python, NLTK &amp; scikit-learn · intent (Naive Bayes) + sentiment (VADER) · no AI service</p>
+  </div>
+</header>
+
+<main>
+  <section class="card" id="chat">
+    <div id="messages" aria-live="polite"></div>
+    <div class="chips" id="chips"></div>
+    <form id="form">
+      <input id="input" autocomplete="off" placeholder="Ask about crypto… e.g. What is a wallet?" aria-label="Your message">
+      <button class="send" type="submit">Send</button>
+    </form>
+  </section>
+
+  <aside class="card hood">
+    <h2>Under the hood</h2>
+    <p class="sub">How the model read your last message</p>
+    <div id="hood"><p class="empty">Send a message to see each step.</p></div>
+  </aside>
+</main>
+
+<script>
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+const hood = document.getElementById("hood");
+
+const suggestions = [
+  "What is bitcoin?", "How do wallets work?", "How do I avoid scams?",
+  "What is a stablecoin?", "Protect my savings from inflation", "What is DeFi?", "help"
+];
+
+function addMessage(text, who, intent, sentiment) {
+  const box = document.createElement("div");
+  box.className = "msg " + who;
+  box.textContent = text;
+  if (intent) {
+    const tags = el("div", "tags");
+    tags.appendChild(el("span", "tag" + (intent === "unknown" ? " unknown" : ""), "intent: " + intent));
+    if (sentiment) tags.appendChild(el("span", "tag " + sentiment, "mood: " + sentiment));
+    box.appendChild(tags);
+  }
+  messages.appendChild(box);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function step(n, label, body) {
+  const s = el("div", "step");
+  const l = el("div", "step-label");
+  l.innerHTML = "<b>" + n + "</b> · ";
+  l.appendChild(document.createTextNode(label));
+  s.appendChild(l);
+  s.appendChild(body);
+  return s;
+}
+
+function showHood(original, data) {
+  hood.replaceChildren();
+
+  hood.appendChild(step(1, "Your message", el("div", "mono", original)));
+
+  const words = el("div", "mono");
+  const cleaned = data.clean_text ? data.clean_text.split(" ") : [];
+  if (!cleaned.length) words.appendChild(el("span", "empty", "(nothing left after removing stop words)"));
+  cleaned.forEach(w => {
+    words.appendChild(el("span", "word" + (data.known_words.includes(w) ? " known" : ""), w));
+  });
+  const wrap = el("div");
+  wrap.appendChild(words);
+  wrap.appendChild(el("div", "legend", "Lowercased, tokenized, stop words removed, stemmed. Green = a word the model learned."));
+  hood.appendChild(step(2, "After NLTK cleaning", wrap));
+
+  const bars = el("div");
+  if (!data.top.length) {
+    bars.appendChild(el("p", "empty", "No known words, so the model can't make a guess."));
+  }
+  data.top.forEach(t => {
+    const row = el("div", "bar-row");
+    const head = el("div", "bar-head");
+    head.appendChild(el("span", "mono", t.intent));
+    head.appendChild(el("span", "", Math.round(t.probability * 100) + "%"));
+    const bar = el("div", "bar");
+    const fill = el("span");
+    fill.style.width = (t.probability * 100) + "%";
+    const th = el("div", "th");
+    th.style.left = (data.threshold * 100) + "%";
+    bar.appendChild(fill);
+    bar.appendChild(th);
+    row.appendChild(head);
+    row.appendChild(bar);
+    bars.appendChild(row);
+  });
+  bars.appendChild(el("div", "legend", "Orange line = minimum confidence (" + Math.round(data.threshold * 100) + "%). Below it, the bot answers \"unknown\"."));
+  hood.appendChild(step(3, "Naive Bayes top guesses", bars));
+
+  const mood = el("div");
+  const moodHead = el("div", "bar-head");
+  moodHead.appendChild(el("span", "mono", data.sentiment));
+  moodHead.appendChild(el("span", "", "score " + (data.sentiment_score > 0 ? "+" : "") + data.sentiment_score.toFixed(2)));
+  const scale = el("div", "mood-scale");
+  const dot = el("div", "mood-dot");
+  dot.style.left = ((data.sentiment_score + 1) / 2 * 100) + "%";
+  scale.appendChild(dot);
+  const ends = el("div", "mood-ends");
+  ["−1 negative", "0", "+1 positive"].forEach(t => ends.appendChild(el("span", "", t)));
+  mood.appendChild(moodHead);
+  mood.appendChild(scale);
+  mood.appendChild(ends);
+  mood.appendChild(el("div", "legend", "VADER reads the original message (it uses \"not\", \"!!!\" and CAPS). Below −0.3 is negative, above +0.3 is positive."));
+  hood.appendChild(step(4, "VADER sentiment", mood));
+
+  const result = el("div", "mono", data.intent + " + " + data.sentiment + " tone");
+  hood.appendChild(step(5, "Chosen intent + mood → answer", result));
+}
+
+async function send(text) {
+  text = text.trim();
+  if (!text) return;
+  addMessage(text, "user");
+  input.value = "";
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    addMessage(data.reply, "bot", data.intent, data.sentiment);
+    showHood(text, data);
+  } catch (err) {
+    addMessage("Couldn't reach the Python server. Is app.py running?", "bot");
+  }
+  input.focus();
+}
+
+document.getElementById("form").addEventListener("submit", e => {
+  e.preventDefault();
+  send(input.value);
+});
+
+const chips = document.getElementById("chips");
+suggestions.forEach(s => {
+  const b = el("button", "chip", s);
+  b.type = "button";
+  b.addEventListener("click", () => send(s));
+  chips.appendChild(b);
+});
+
+addMessage("Hi! I'm {{ bot_name }}. Ask me anything about crypto basics, or tap a topic below.", "bot");
+input.focus();
+</script>
+</body>
+</html>
