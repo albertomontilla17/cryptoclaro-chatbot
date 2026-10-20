@@ -53,6 +53,7 @@
   }
   .tag.unknown, .tag.negative { background: var(--warn-soft); color: var(--warn); }
   .tag.neutral { background: var(--line); color: var(--muted); }
+  .tag.coin { background: var(--ink); color: var(--panel); }
   .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
   .tags .tag { margin-top: 0; }
   .mood-scale { position: relative; height: 8px; border-radius: 99px; margin: 8px 0 4px;
@@ -107,7 +108,7 @@
   <div class="logo">₿</div>
   <div>
     <h1>{{ bot_name }}</h1>
-    <p>Crypto 101 chatbot · Python, NLTK &amp; scikit-learn · intent (Naive Bayes) + sentiment (VADER) · no AI service</p>
+    <p>Crypto 101 chatbot · Python, NLTK &amp; scikit-learn · intent (Naive Bayes) + coin detection + sentiment (VADER) · no AI service</p>
   </div>
 </header>
 
@@ -134,17 +135,18 @@ const input = document.getElementById("input");
 const hood = document.getElementById("hood");
 
 const suggestions = [
-  "What is bitcoin?", "How do wallets work?", "How do I avoid scams?",
-  "What is a stablecoin?", "Protect my savings from inflation", "What is DeFi?", "help"
+  "What is Bitcoin?", "Bitcoin vs Ethereum", "What is Solana?", "Is USDT safe?",
+  "How do wallets work?", "How do I avoid scams?", "Protect my savings from inflation", "What is DeFi?", "help"
 ];
 
-function addMessage(text, who, intent, sentiment) {
+function addMessage(text, who, intent, sentiment, coins) {
   const box = document.createElement("div");
   box.className = "msg " + who;
   box.textContent = text;
   if (intent) {
     const tags = el("div", "tags");
     tags.appendChild(el("span", "tag" + (intent === "unknown" ? " unknown" : ""), "intent: " + intent));
+    (coins || []).forEach(c => tags.appendChild(el("span", "tag coin", "coin: " + c)));
     if (sentiment) tags.appendChild(el("span", "tag " + sentiment, "mood: " + sentiment));
     box.appendChild(tags);
   }
@@ -208,6 +210,14 @@ function showHood(original, data) {
   bars.appendChild(el("div", "legend", "Orange line = minimum confidence (" + Math.round(data.threshold * 100) + "%). Below it, the bot answers \"unknown\"."));
   hood.appendChild(step(3, "Naive Bayes top guesses", bars));
 
+  const coinBox = el("div");
+  const coinWords = el("div", "mono");
+  if (!data.coins.length) coinWords.appendChild(el("span", "empty", "No coin mentioned"));
+  data.coins.forEach(c => coinWords.appendChild(el("span", "word known", c)));
+  coinBox.appendChild(coinWords);
+  coinBox.appendChild(el("div", "legend", "Keyword matching on the original words (e.g. \"btc\" → Bitcoin, \"usdt\" → Tether)."));
+  hood.appendChild(step(4, "Coin detection", coinBox));
+
   const mood = el("div");
   const moodHead = el("div", "bar-head");
   moodHead.appendChild(el("span", "mono", data.sentiment));
@@ -222,10 +232,12 @@ function showHood(original, data) {
   mood.appendChild(scale);
   mood.appendChild(ends);
   mood.appendChild(el("div", "legend", "VADER reads the original message (it uses \"not\", \"!!!\" and CAPS). Below −0.3 is negative, above +0.3 is positive."));
-  hood.appendChild(step(4, "VADER sentiment", mood));
+  hood.appendChild(step(5, "VADER sentiment", mood));
 
-  const result = el("div", "mono", data.intent + " + " + data.sentiment + " tone");
-  hood.appendChild(step(5, "Chosen intent + mood → answer", result));
+  const parts = [data.intent];
+  if (data.coins.length) parts.push(data.coins.join(", "));
+  parts.push(data.sentiment + " tone");
+  hood.appendChild(step(6, "Intent + coin + mood → answer", el("div", "mono", parts.join(" + "))));
 }
 
 async function send(text) {
@@ -240,7 +252,7 @@ async function send(text) {
       body: JSON.stringify({ message: text })
     });
     const data = await res.json();
-    addMessage(data.reply, "bot", data.intent, data.sentiment);
+    addMessage(data.reply, "bot", data.intent, data.sentiment, data.coins);
     showHood(text, data);
   } catch (err) {
     addMessage("Couldn't reach the Python server. Is app.py running?", "bot");

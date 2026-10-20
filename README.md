@@ -40,10 +40,11 @@ The first run downloads small NLTK data files, so it needs internet once.
 2. **Turn words into numbers (TF-IDF):** words that appear in many topics, like "crypto", count less.
 3. **Classify (Multinomial Naive Bayes):** the model predicts which of 13 intents the message belongs to.
 4. **Confidence check:** if the top guess is below 15%, or no known words are found, the bot says it doesn't know.
-5. **Sentiment (NLTK VADER):** scores the original message from -1 (negative) to +1 (positive). VADER is a ready-made model, so it needs no training data. A few crypto words like "scammed" and "hacked" were added to its word list.
-6. **Answer:** each intent has one fixed, educational answer. The mood adjusts the tone: a sympathetic opening for negative messages and an upbeat one for positive messages.
+5. **Coin detection (keyword entity extraction):** spots Bitcoin, Ethereum, Tether (USDT), BNB or Solana in the original words, including tickers like "btc" or "usdt". A question about the coin itself gets that coin's profile, two coins get a short comparison, and a topic question ("How do I buy Ethereum?") gets the topic answer plus a line about the coin.
+6. **Sentiment (NLTK VADER):** scores the original message from -1 (negative) to +1 (positive). VADER is a ready-made model, so it needs no training data. A few crypto words like "scammed" and "hacked" were added to its word list.
+7. **Answer:** each intent has one fixed, educational answer. The coin adds specifics, and the mood adjusts the tone: a sympathetic opening for negative messages and an upbeat one for positive messages.
 
-Intent classification answers *what* the user is asking about. Sentiment analysis answers *how they feel* about it.
+Intent classification answers *what* the user is asking about, coin detection answers *which coin*, and sentiment analysis answers *how they feel* about it.
 
 Topics: greeting, help, thanks, bye, crypto basics, value, wallets, safety and scams,
 investing, Web3 and NFTs, everyday use and stablecoins, inflation and savings, DeFi.

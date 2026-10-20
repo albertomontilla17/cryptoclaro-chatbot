@@ -29,8 +29,9 @@ def chat():
     details = chatbot.analyze(message)
     sentiment = details["sentiment"]
     return jsonify({
-        "reply": chatbot.generate_response(details["intent"], sentiment["label"]),
+        "reply": chatbot.generate_response(details["intent"], sentiment["label"], details["coins"]),
         "intent": details["intent"],
+        "coins": [chatbot.COINS[c]["name"] for c in details["coins"]],
         "sentiment": sentiment["label"],
         "sentiment_score": round(sentiment["score"], 3),
         "confidence": round(details["confidence"], 3),
